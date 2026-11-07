@@ -1,0 +1,461 @@
+---
+// Página inicial — convertida do index.html do site antigo (Artools).
+// O <head>, os estilos globais e o cabeçalho agora vêm do Layout.
+// Imagens e vídeo ficam em /public/assets e são referenciados com "/assets/...".
+import Layout from "../layouts/Layout.astro";
+import Button from "../components/Button.astro";
+import FeatureCard from "../components/FeatureCard.astro";
+import Marquee from "../components/Marquee.astro";
+import SpecsTable from "../components/SpecsTable.astro";
+
+// Palavras da faixa infinita (dobra preta entre os cards e o vídeo)
+const marqueeWords = [
+    "Precisão",
+    "Traço perfeito",
+    "Fluxo contínuo",
+    "Equilíbrio",
+    "Leveza",
+    "Assinatura",
+    "Caligrafia",
+    "Silêncio",
+    "Ideias tangíveis",
+];
+
+// Especificações técnicas (dobra preta com a tabela, abaixo da faixa de vídeo)
+const specs = [
+    { label: "Material", value: "Alumínio aeroespacial 6061-T6" },
+    { label: "Construção", value: "Corpo monobloco usinado em CNC de 5 eixos" },
+    { label: "Peso", value: "14 g" },
+    { label: "Comprimento", value: "140 mm" },
+    { label: "Diâmetro", value: "9,5 mm" },
+    { label: "Ponta", value: "0,3 mm" },
+    { label: "Sistema de tinta", value: "Fluxo híbrido de baixa viscosidade, com regulação por capilaridade assistida" },
+    { label: "Ângulo de escrita", value: "Traço contínuo até 15°" },
+    { label: "Rendimento", value: "2.000 m por carga" },
+    { label: "Grip", value: "Micro-usinagem a laser, rugosidade Ra 0,8 µm" },
+    { label: "Mecanismo", value: "Clique silencioso com ponta amortecida" },
+    { label: "Ergonomia", value: "Centro de gravidade neutro, reduz a fadiga em 40%" },
+    { label: "Origem", value: "Projetada e fabricada em Zurique, Suíça" },
+    { label: "Garantia", value: "5 anos" },
+];
+---
+
+<Layout title="A Caneta Mais Tecnológica do Mundo | Precision Series">
+    <!-- HERO SECTION -->
+    <main class="hero-scrub-container relative bg-[#EAEAE5]">
+        <div class="sticky top-0 h-screen w-full overflow-hidden">
+
+            <!-- VIDEO CENTERPIECE (Canvas Background) -->
+            <div class="absolute inset-0 z-0 flex items-center justify-center bg-stone-100">
+                <!-- Canvas for Image Sequence -->
+                <canvas id="hero-canvas" width="1280" height="720"
+                    class="w-full h-full object-cover relative z-10"></canvas>
+            </div>
+
+            <!-- OVERLAY CONTENT (Text Layer) -->
+            <div
+                class="relative z-10 w-full h-full max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-12 pointer-events-none">
+
+                <!-- Headline Group (Left aligned) -->
+                <div
+                    class="col-span-1 md:col-span-10 lg:col-span-7 h-full flex flex-col justify-center px-6 md:pl-24 text-left pointer-events-auto">
+                    <!-- Badge -->
+                    <div class="inline-flex items-center gap-3 mb-4 reveal-up delay-100">
+                        <span class="w-2 h-2 bg-stone-900 rounded-full"></span>
+                        <span class="text-xs font-mono uppercase tracking-[0.2em] text-stone-500">Precision
+                            Series</span>
+                    </div>
+
+                    <!-- Headline -->
+                    <h1
+                        class="font-display text-5xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tighter leading-[0.8] mb-5 text-stone-900 -ml-1 md:-ml-1">
+                        <div class="reveal-up delay-100 block">A caneta</div>
+                        <div class="reveal-up delay-200 block text-outline text-transparent">mais tecnológica</div>
+                        <div class="reveal-up delay-300 block">do mundo.</div>
+                    </h1>
+
+                    <!-- Subtext -->
+                    <p
+                        class="text-lg md:text-xl text-stone-600 max-w-lg leading-relaxed reveal-up delay-500 mb-8 font-light">
+                        A Artools Precision Pen redefine o equilíbrio entre peso, fluxo e design. Feita para criadores
+                        que exigem perfeição em cada traço.
+                    </p>
+
+                    <!-- Buttons -->
+                    <div class="flex flex-wrap gap-4 reveal-up delay-700">
+                        <!-- "Comprar Agora" leva ao catálogo; "Explorar" desce até a seção de tecnologia -->
+                        <Button href="/segunda-pagina">Comprar Agora</Button>
+                        <Button href="#tech-specs" variant="light" icon="solar:arrow-down-linear">Explorar</Button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT SIDE CONTROLS -->
+            <div
+                class="absolute right-8 top-1/2 -translate-y-1/2 hidden md:flex flex-col items-center gap-8 z-30 mix-blend-difference text-stone-400">
+                <div class="text-xs font-mono">01</div>
+                <div class="w-px h-12 bg-stone-300"></div>
+                <!-- Controls -->
+            </div>
+
+            <!-- SCROLL HINT -->
+            <div
+                class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20 opacity-60 pointer-events-none">
+                <span class="text-[10px] font-mono uppercase tracking-widest text-stone-500">Scroll to Control</span>
+                <div class="w-px h-8 bg-stone-400 overflow-hidden relative">
+                    <div class="absolute top-0 left-0 w-full h-full bg-stone-900 animate-scroll-line"></div>
+                </div>
+            </div>
+
+            <!-- Gradient Fade to Next Section -->
+            <div
+                class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-stone-50 to-transparent pointer-events-none z-10">
+            </div>
+        </div>
+    </main>
+
+    <!-- 2. TECH SPECS SECTION (LIGHT) -->
+    <section
+        class="relative z-20 bg-stone-50 text-stone-900 py-24 md:py-32 overflow-hidden border-t border-stone-200 bg-grid selection:bg-stone-900 selection:text-white scroll-mt-16"
+        id="tech-specs">
+        <!-- Noise Overlay -->
+        <div
+            class="absolute inset-0 z-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
+        </div>
+
+        <div class="max-w-[1440px] mx-auto px-6 md:px-24 relative z-10">
+
+            <!-- Watermark Text -->
+            <div
+                class="absolute top-0 right-0 -mr-24 -mt-24 pointer-events-none select-none opacity-[0.03] z-0 overflow-hidden">
+                <span class="font-display font-bold text-[15rem] leading-none text-stone-900">PRECISION</span>
+            </div>
+
+            <!-- Header -->
+            <div class="mb-24 reveal-up relative z-10">
+                <div class="inline-flex items-center gap-2 mb-6">
+                    <span class="w-1.5 h-1.5 bg-stone-400 rounded-full"></span>
+                    <span class="text-xs font-mono uppercase tracking-[0.2em] text-stone-400">Technology</span>
+                </div>
+                <h2
+                    class="font-display text-5xl md:text-7xl font-medium tracking-tight leading-none text-stone-900 max-w-4xl mix-blend-darken">
+                    Engenharia Suíça.<br>
+                    <span class="text-stone-400">Precisão Molecular.</span>
+                </h2>
+                <p class="mt-8 text-lg text-stone-500 max-w-2xl font-light leading-relaxed text-balance">
+                    Nossa arquitetura de fluxo proprietária sincroniza a deposição de tinta em tempo real. Construída
+                    sobre um chassi de alumínio aeroespacial usinado em CNC de 5 eixos.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+
+                <!-- Left Visual -->
+                <div class="lg:col-span-7 relative group perspective-1000">
+                    <div
+                        class="absolute inset-0 bg-stone-200/50 rounded-2xl transform rotate-2 scale-[0.98] transition-transform duration-700 group-hover:rotate-1">
+                    </div>
+
+                    <!-- Image Container with Reveal -->
+                    <div
+                        class="relative rounded-2xl overflow-hidden aspect-[4/3] bg-stone-100 reveal-up delay-200 shadow-2xl shadow-stone-200/50 transform transition-transform duration-700 group-hover:-translate-y-2">
+                        <!-- Scanline Effect -->
+                        <div
+                            class="absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-transparent z-20 translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-[1.5s] ease-in-out pointer-events-none">
+                        </div>
+
+                        <img src="/assets/raw_files/artools_tech_feature.png" alt="Artools Tech Detail"
+                            class="w-full h-full object-cover grayscale contrast-110 group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100 mix-blend-multiply">
+
+                        <!-- Overlay UI Elements - Glassmorphism -->
+                        <div
+                            class="absolute top-8 left-8 p-4 border border-white/40 rounded-lg backdrop-blur-md bg-white/30 shadow-lg text-stone-800 hover:bg-white/50 transition-colors cursor-crosshair">
+                            <iconify-icon icon="solar:database-bold-duotone"
+                                class="text-2xl text-stone-800 mb-2"></iconify-icon>
+                            <div class="text-[10px] font-mono text-stone-600 tracking-widest uppercase">Core_Alu_6061
+                            </div>
+                            <div class="h-0.5 w-full bg-stone-900/20 mt-2 rounded-full overflow-hidden">
+                                <div class="h-full w-[80%] bg-stone-900"></div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="absolute bottom-8 right-8 p-4 border border-white/40 rounded-lg backdrop-blur-md bg-white/30 shadow-lg text-right hover:bg-white/50 transition-colors cursor-crosshair">
+                            <div class="text-3xl font-display font-bold text-stone-900">0.3<span
+                                    class="text-sm text-stone-500 font-mono align-top ml-1">mm</span></div>
+                            <div class="text-[10px] font-mono text-stone-600 tracking-widest uppercase">Tip_Precision
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Content (List) -->
+                <div class="lg:col-span-5 space-y-8">
+
+                    <!-- Feature 01 -->
+                    <div
+                        class="reveal-up delay-300 group cursor-crosshair p-6 rounded-xl hover:bg-white hover:shadow-xl hover:shadow-stone-200/50 transition-all duration-500 border border-transparent hover:border-stone-100">
+                        <div class="flex items-baseline gap-4 mb-3">
+                            <span
+                                class="text-xs font-mono text-stone-400 group-hover:text-stone-900 group-hover:scale-110 transition-all duration-300">01</span>
+                            <h3
+                                class="text-2xl font-display font-medium text-stone-900 group-hover:translate-x-1 transition-transform duration-300">
+                                Alumínio Aeroespacial</h3>
+                        </div>
+                        <p
+                            class="pl-8 text-stone-500 text-sm leading-relaxed group-hover:text-stone-600 transition-colors border-l border-stone-200 group-hover:border-stone-900 pl-4">
+                            Estrutura monobloco usinada em Alumínio 6061-T6. Leveza extrema (14g) com resistência
+                            estrutural de nível militar.
+                        </p>
+                    </div>
+
+                    <!-- Feature 02 -->
+                    <div
+                        class="reveal-up delay-500 group cursor-crosshair p-6 rounded-xl hover:bg-white hover:shadow-xl hover:shadow-stone-200/50 transition-all duration-500 border border-transparent hover:border-stone-100">
+                        <div class="flex items-baseline gap-4 mb-3">
+                            <span
+                                class="text-xs font-mono text-stone-400 group-hover:text-stone-900 group-hover:scale-110 transition-all duration-300">02</span>
+                            <h3
+                                class="text-2xl font-display font-medium text-stone-900 group-hover:translate-x-1 transition-transform duration-300">
+                                Fluxo Híbrido</h3>
+                        </div>
+                        <p
+                            class="pl-8 text-stone-500 text-sm leading-relaxed group-hover:text-stone-600 transition-colors border-l border-stone-200 group-hover:border-stone-900 pl-4">
+                            Sistema de tinta de baixa viscosidade com regulação por capilaridade assistida. O traço
+                            nunca falha até 15°.
+                        </p>
+                    </div>
+
+                    <!-- Feature 03 -->
+                    <div
+                        class="reveal-up delay-700 group cursor-crosshair p-6 rounded-xl hover:bg-white hover:shadow-xl hover:shadow-stone-200/50 transition-all duration-500 border border-transparent hover:border-stone-100">
+                        <div class="flex items-baseline gap-4 mb-3">
+                            <span
+                                class="text-xs font-mono text-stone-400 group-hover:text-stone-900 group-hover:scale-110 transition-all duration-300">03</span>
+                            <h3
+                                class="text-2xl font-display font-medium text-stone-900 group-hover:translate-x-1 transition-transform duration-300">
+                                Grip Texturizado</h3>
+                        </div>
+                        <p
+                            class="pl-8 text-stone-500 text-sm leading-relaxed group-hover:text-stone-600 transition-colors border-l border-stone-200 group-hover:border-stone-900 pl-4">
+                            Micro-usinagem a laser cria uma superfície de aderência perfeita (Ra 0.8µm) sem acumular
+                            resíduos.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. WRITING EXPERIENCE (FLASHLIGHT CARDS) -->
+    <section class="relative z-20 bg-[#EAEAE5] py-24 md:py-32 overflow-hidden border-t border-stone-300">
+        <div class="max-w-[1440px] mx-auto px-6 md:px-24">
+
+            <div class="text-center mb-24 reveal-up">
+                <span class="text-xs font-mono uppercase tracking-[0.2em] text-stone-500 mb-6 block">Architecture of
+                    Thought</span>
+                <h2
+                    class="font-display text-5xl md:text-6xl font-medium tracking-tight text-stone-900 max-w-3xl mx-auto">
+                    A ferramenta invisível para<br>
+                    <span class="text-stone-400">ideias tangíveis.</span>
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <FeatureCard icon="solar:pen-new-square-linear" title="Fluxo Contínuo" order={1}>
+                    A tinta flui sem interrupções, permitindo que seus pensamentos corram livremente para o
+                    papel sem fricção.
+                </FeatureCard>
+
+                <FeatureCard icon="solar:soundwave-square-linear" title="Silêncio Absoluto" order={2}>
+                    Mecanismo de clique silencioso e ponta amortecida. Escreva em qualquer ambiente sem
+                    distrações.
+                </FeatureCard>
+
+                <FeatureCard icon="solar:scale-linear" title="Equilíbrio Neutro" order={3}>
+                    Centro de gravidade estudado para repousar na junção da mão, reduzindo a fadiga em 40%.
+                </FeatureCard>
+
+            </div>
+        </div>
+
+
+        <!-- Background Decor -->
+        <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-stone-200/50 rounded-full blur-3xl -z-10 animate-pulse pointer-events-none mix-blend-multiply">
+        </div>
+    </section>
+
+    <!-- MARQUEE (faixa infinita de palavras em fonte cursiva, fundo preto) -->
+    <section class="relative z-20 bg-black py-1 overflow-hidden" aria-label="Atributos da caneta">
+        <Marquee words={marqueeWords} duration={30} />
+    </section>
+
+    <!--
+        FAIXA DE VÍDEO (logo abaixo do marquee, sem overlay)
+        Altura = 1,7x a altura da dobra do marquee (70% maior), em cada tamanho de tela.
+        A dobra do marquee mede: altura da linha (tamanho da letra × 1.3) + 0.5rem (py-1).
+          celular: letra 2.25rem → (2.25rem × 1.3 + 0.5rem) × 1.7 ≈ 93px
+          tablet:  letra 3rem    → (3rem    × 1.3 + 0.5rem) × 1.7 ≈ 120px
+          desktop: letra 3.75rem → (3.75rem × 1.3 + 0.5rem) × 1.7 ≈ 146px
+        Se mudar o tamanho da letra no Marquee.astro, atualize estas contas também.
+    -->
+    <section
+        class="relative z-20 w-full overflow-hidden bg-black h-[calc((2.25rem*1.3+0.5rem)*1.7)] md:h-[calc((3rem*1.3+0.5rem)*1.7)] lg:h-[calc((3.75rem*1.3+0.5rem)*1.7)]"
+        aria-hidden="true">
+        <video autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover">
+            <source src="/assets/raw_files/video.mp4" type="video/mp4">
+        </video>
+    </section>
+
+    <!-- ESPECIFICAÇÕES TÉCNICAS (lista de itens, fundo preto) -->
+    <!-- scroll-mt-16: ao chegar pelo menu, a tabela não fica escondida atrás do cabeçalho fixo -->
+    <section class="relative z-20 bg-black text-white py-6 md:py-8 scroll-mt-16" id="especificacoes">
+        <h2 class="sr-only">Especificações técnicas</h2>
+        <div class="max-w-[1440px] mx-auto px-6 md:px-12">
+            <div class="px-0 md:px-14 py-2 reveal-up">
+                <SpecsTable rows={specs} caption="Especificações técnicas da Artools Precision Pen" />
+            </div>
+
+            <!-- Chamada para o catálogo (liga a página inicial à página de produtos) -->
+            <div class="px-0 md:px-14 pt-10 pb-12 md:pb-16 border-t border-stone-800 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <p class="font-display text-2xl md:text-3xl font-medium tracking-tight">
+                    Nove modelos.<span class="text-stone-500"> Escolha o seu.</span>
+                </p>
+                <Button href="/segunda-pagina" variant="cta" icon="solar:arrow-right-linear">Ver catálogo completo</Button>
+            </div>
+        </div>
+    </section>
+
+    <script is:inline>
+        // Register ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const canvas = document.getElementById("hero-canvas");
+            const context = canvas.getContext("2d");
+
+            // Configuration
+            const frameCount = 192;
+            const currentFrame = { index: 0 };
+            const images = [];
+
+            // Preload Images
+            // Uses a promise to maybe show loading state if needed, but for now just eager load
+            const preloadImages = () => {
+                for (let i = 1; i <= frameCount; i++) {
+                    const img = new Image();
+                    // Pad with leading zeros: 0001, 0002...
+                    const frameNumber = i.toString().padStart(4, '0');
+                    img.src = `/assets/video_frames/frame_${frameNumber}.jpg`;
+                    images.push(img);
+                }
+            };
+
+            // Render function
+            const render = () => {
+                // Determine which frame to draw
+                const frameIndex = Math.floor(currentFrame.index);
+                const img = images[frameIndex];
+
+                if (img && img.complete) {
+                    // Draw image to cover canvas
+                    // Since canvas resolution is fixed (1280x720) and we use CSS object-cover,
+                    // we can just draw the image full size on the canvas coordinates.
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    context.drawImage(img, 0, 0, canvas.width, canvas.height);
+                }
+            };
+
+            // Start Preloading
+            preloadImages();
+
+            // Set Initial Frame
+            // Wait for the first image to load before rendering it
+            if (images[0]) {
+                images[0].onload = render;
+            }
+
+
+            // Initial Reveal Animation (Hero Text Only)
+            const heroReveals = document.querySelectorAll('.hero-scrub-container .reveal-up');
+            heroReveals.forEach((el, index) => {
+                setTimeout(() => {
+                    el.classList.add('active');
+                }, 100 * index);
+            });
+
+            // Canvas Intro Animation
+            gsap.fromTo(canvas,
+                { opacity: 0, scale: 1.1 },
+                { opacity: 1, scale: 1, duration: 1.5, ease: "power3.out" }
+            );
+
+            // Parallax Effects for Hero Text (Blur Out on Scroll)
+            gsap.to(".hero-scrub-container .reveal-up", {
+                y: -60,
+                opacity: 0,
+                filter: "blur(15px)",
+                stagger: 0.05,
+                scrollTrigger: {
+                    trigger: ".hero-scrub-container",
+                    start: "top top",
+                    end: "15% top",
+                    scrub: true
+                }
+            });
+
+            // Reveal Animation for generic sections (Tech Specs, etc)
+            gsap.utils.toArray('section .reveal-up, section .reveal-zoom').forEach(function (elem) {
+                ScrollTrigger.create({
+                    trigger: elem,
+                    start: "top 85%",
+                    onEnter: function () {
+                        elem.classList.add('active');
+                    }
+                });
+            });
+
+            // Flashlight Effect Function
+            window.updateFlashlight = function (e, card) {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty("--mouse-x", `${x}px`);
+                card.style.setProperty("--mouse-y", `${y}px`);
+            }
+
+            // GSAP Scroll Animation
+            // We animate the 'index' property of currentFrame object from 0 to 191
+            gsap.to(currentFrame, {
+                index: frameCount - 1,
+                ease: "none", // Linear scrub
+                scrollTrigger: {
+                    trigger: ".hero-scrub-container",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 0, // Instant response (canvas is fast enough)
+                    onUpdate: () => {
+                        requestAnimationFrame(render);
+                    }
+                }
+            });
+        });
+
+        // Add custom keyframe for scroll line
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            @keyframes scroll-line {
+                0% { transform: translateY(-100%); }
+                100% { transform: translateY(100%); }
+            }
+            .animate-scroll-line {
+                animation: scroll-line 1.5s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+            }
+        `;
+        document.head.appendChild(styleSheet);
+    </script>
+</Layout>

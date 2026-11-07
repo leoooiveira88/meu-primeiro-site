@@ -1,0 +1,63 @@
+---
+// Botão do site com cantos levemente arredondados (rounded-md).
+// Uso:
+//   <Button>Comprar Agora</Button>
+//   <Button variant="light" icon="solar:arrow-down-linear">Explorar</Button>
+//   <Button variant="cta" icon="solar:arrow-right-linear">Get Early Access</Button>
+//
+// variant:
+//   "dark"  → preto, sobe no hover (padrão)
+//   "light" → branco, sobe e ganha borda no hover
+//   "cta"   → branco, cresce e é preenchido de cinza no hover (para fundos escuros)
+// icon: nome de um ícone do Iconify, mostrado depois do texto (opcional)
+// type: "button" (padrão) ou "submit" (para enviar um formulário)
+// class: classes extras somadas às do botão (ex.: "w-full justify-center")
+// href: se informado, o botão vira um link (<a>) com a mesma aparência.
+//   <Button href="/segunda-pagina">Ver catálogo</Button>
+// Qualquer outro atributo (id, data-*, aria-*...) é repassado para o <button> ou <a>.
+//   <Button data-open-notify aria-haspopup="dialog">Avise-me</Button>
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends Omit<HTMLAttributes<"button">, "type"> {
+	variant?: "dark" | "light" | "cta";
+	icon?: string;
+	type?: "button" | "submit" | "reset";
+	href?: string;
+}
+
+const { variant = "dark", icon, type = "button", href, class: extraClass, ...attrs } = Astro.props;
+
+// Com href vira link (<a>); sem href continua <button>
+const Tag = href ? "a" : "button";
+const tagAttrs = href ? { href } : { type };
+
+const styles = {
+	dark: {
+		button: "group relative px-8 py-4 bg-stone-900 text-white rounded-md overflow-hidden transition-all hover:-translate-y-1",
+		content: "relative z-10 flex items-center gap-2 text-sm font-medium tracking-wide",
+		icon: "",
+	},
+	light: {
+		button: "group px-8 py-4 bg-white text-stone-900 rounded-md border border-transparent hover:border-stone-200 transition-all hover:-translate-y-1 flex items-center gap-2",
+		content: "flex items-center gap-2 text-sm font-medium tracking-wide",
+		icon: "group-hover:translate-y-0.5 transition-transform",
+	},
+	cta: {
+		button: "relative group/btn overflow-hidden rounded-md bg-white text-black px-8 py-3 font-medium text-sm hover:scale-105 transition-transform",
+		content: "relative z-10 flex items-center gap-2",
+		icon: "",
+	},
+};
+
+const style = styles[variant];
+---
+
+<Tag {...tagAttrs} class:list={["inline-block", style.button, extraClass]} {...attrs}>
+    <span class={style.content}>
+        <slot />
+        {icon && <iconify-icon icon={icon} class={style.icon}></iconify-icon>}
+    </span>
+    {variant === "cta" && (
+        <div class="absolute inset-0 bg-stone-200 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
+    )}
+</Tag>

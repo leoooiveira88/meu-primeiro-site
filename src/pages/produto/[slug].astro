@@ -1,0 +1,157 @@
+---
+// Terceira página do site: detalhes de um produto.
+//
+// Este arquivo é uma ROTA DINÂMICA. O [slug] entre colchetes no nome do arquivo
+// é uma parte variável do endereço. Um único arquivo gera uma página para cada caneta:
+//   /produto/precision-one, /produto/signature-noir, /produto/atelier-brass...
+//
+// O getStaticPaths() diz ao Astro quais páginas criar: uma para cada item da lista
+// de produtos, entregando a caneta correspondente para a página pela prop "product".
+import Layout from "../../layouts/Layout.astro";
+import Button from "../../components/Button.astro";
+import ProductCard from "../../components/ProductCard.astro";
+import SpecsTable from "../../components/SpecsTable.astro";
+import NotifyForm from "../../components/NotifyForm.astro";
+import { products, photoUrl, type Product } from "../../data/products";
+
+export function getStaticPaths() {
+	return products.map((product) => ({
+		params: { slug: product.slug },
+		props: { product },
+	}));
+}
+
+interface Props {
+	product: Product;
+}
+
+const { product } = Astro.props;
+
+// Tabela completa de especificações (na faixa preta, embaixo)
+const fullSpecs = [
+	{ label: "Modelo", value: product.code },
+	{ label: "Material", value: product.material },
+	...product.specs,
+	{ label: "Origem", value: "Projetada e fabricada em Zurique, Suíça" },
+	{ label: "Garantia", value: "5 anos" },
+	{ label: "Disponibilidade", value: "Em breve" },
+];
+
+// Três outras canetas para a seção "Veja também" (as que vêm depois desta na lista)
+const index = products.findIndex((item) => item.slug === product.slug);
+const related = [1, 2, 3].map((step) => products[(index + step) % products.length]);
+---
+
+<Layout title={`${product.title} | Artools`}>
+    <main class="pt-28 md:pt-32">
+
+        <!-- PRODUTO: foto à esquerda, informações e botão à direita -->
+        <section class="max-w-[1440px] mx-auto px-6 md:px-24 pb-24 md:pb-32">
+
+            <!-- Caminho de volta para o catálogo -->
+            <nav aria-label="Caminho" class="mb-10 text-xs font-mono uppercase tracking-[0.2em] text-stone-400">
+                <a href="/segunda-pagina" class="hover:text-stone-900 transition-colors">Catálogo</a>
+                <span class="mx-2">/</span>
+                <span class="text-stone-900" aria-current="page">{product.title}</span>
+            </nav>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+
+                <!-- Foto grande -->
+                <div class="relative aspect-[4/3] rounded-sm overflow-hidden bg-stone-100 border border-stone-300">
+                    <img
+                        src={photoUrl(product.photoId, 1200, 900)}
+                        alt={product.imageAlt}
+                        class="w-full h-full object-cover" />
+                    <span
+                        class="absolute top-5 right-5 px-2 py-1 rounded-sm bg-white/80 backdrop-blur-md text-[10px] font-mono uppercase tracking-[0.2em] text-stone-700">
+                        {product.code}
+                    </span>
+                </div>
+
+                <!-- Informações -->
+                <div>
+                    <div class="inline-flex items-center gap-2 mb-6">
+                        <span class="w-1.5 h-1.5 bg-stone-900 rounded-full"></span>
+                        <span class="text-xs font-mono uppercase tracking-[0.2em] text-stone-500">Em breve</span>
+                    </div>
+
+                    <h1 class="font-display text-5xl md:text-7xl font-medium tracking-tight leading-none text-stone-900 mb-6">
+                        {product.title}
+                    </h1>
+
+                    <p class="text-lg md:text-xl text-stone-600 font-light leading-relaxed mb-6">
+                        {product.description}
+                    </p>
+                    <p class="text-stone-500 leading-relaxed mb-10">
+                        {product.story}
+                    </p>
+
+                    <!-- Especificações rápidas -->
+                    <dl class="grid grid-cols-3 gap-6 py-6 mb-10 border-y border-stone-300">
+                        <div>
+                            <dt class="text-[10px] font-mono uppercase tracking-[0.2em] text-stone-400 mb-2">Material</dt>
+                            <dd class="text-sm text-stone-900">{product.material}</dd>
+                        </div>
+                        {product.specs.map((spec) => (
+                            <div>
+                                <dt class="text-[10px] font-mono uppercase tracking-[0.2em] text-stone-400 mb-2">{spec.label}</dt>
+                                <dd class="text-2xl font-display font-medium text-stone-900">{spec.value}</dd>
+                            </div>
+                        ))}
+                    </dl>
+
+                    <!-- Botão "Avise-me" (componente Button). O data-open-notify faz ele abrir o formulário. -->
+                    <div class="flex flex-wrap items-center gap-6">
+                        <Button
+                            icon="solar:bell-linear"
+                            data-open-notify
+                            data-product-name={product.title}
+                            data-product-code={product.code}
+                            aria-haspopup="dialog">
+                            Avise-me quando chegar
+                        </Button>
+                        <p class="text-sm text-stone-500 max-w-[16rem]">
+                            Você recebe um aviso assim que a {product.title} estiver disponível.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ESPECIFICAÇÕES COMPLETAS (mesma tabela da página inicial, fundo preto) -->
+        <section class="bg-black text-white py-16 md:py-24">
+            <div class="max-w-[1440px] mx-auto px-6 md:px-12">
+                <h2 class="px-0 md:px-14 mb-8 text-xs font-mono uppercase tracking-[0.2em] text-stone-500">
+                    Especificações técnicas
+                </h2>
+                <div class="px-0 md:px-14">
+                    <SpecsTable rows={fullSpecs} caption={`Especificações técnicas da ${product.title}`} />
+                </div>
+            </div>
+        </section>
+
+        <!-- VEJA TAMBÉM: outras canetas, com o mesmo card do catálogo -->
+        <section class="max-w-[1440px] mx-auto px-6 md:px-24 py-24 md:py-32">
+            <h2 class="font-display text-4xl md:text-5xl font-medium tracking-tight text-stone-900 mb-12">
+                Veja também
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {related.map((item) => (
+                    <ProductCard
+                        code={item.code}
+                        title={item.title}
+                        description={item.description}
+                        specs={item.specs}
+                        image={photoUrl(item.photoId)}
+                        imageAlt={item.imageAlt}
+                        href={`/produto/${item.slug}`}
+                    />
+                ))}
+            </div>
+        </section>
+    </main>
+
+    <!-- Formulário "Avise-me" (fica escondido até clicar no botão) -->
+    <NotifyForm productName={product.title} productCode={product.code} />
+</Layout>

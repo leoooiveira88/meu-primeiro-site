@@ -1,0 +1,202 @@
+---
+// Janela (modal) com o formulário "Avise-me": nome, e-mail e telefone.
+// Abre quando a pessoa clica em qualquer botão que tenha o atributo data-open-notify.
+// Coloque o NotifyForm UMA vez por página; todos os botões "Avise-me" da página usam a mesma janela.
+//
+// Cada botão diz de qual caneta é, com data-product-name e data-product-code:
+//   <Button data-open-notify data-product-name="Signature Noir" data-product-code="AT-03">Avise-me</Button>
+//   <NotifyForm />
+//
+// productName / productCode (opcionais): caneta usada quando o botão não informar uma.
+//
+// IMPORTANTE: por enquanto o formulário NÃO envia os dados para lugar nenhum.
+// Ele confere se os campos estão certos e mostra a mensagem de sucesso.
+// Para guardar os contatos de verdade, troque o trecho marcado com "ENVIO" no script
+// por um envio para um serviço de formulários ou para um servidor.
+import Button from "./Button.astro";
+
+interface Props {
+	productName?: string;
+	productCode?: string;
+}
+
+const { productName = "nova caneta", productCode = "" } = Astro.props;
+
+const inputClass =
+	"w-full px-4 py-3 rounded-md border border-stone-300 bg-white text-stone-900 placeholder:text-stone-400 " +
+	"focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900 transition-colors";
+const labelClass = "block mb-2 text-[10px] font-mono uppercase tracking-[0.2em] text-stone-500";
+---
+
+<dialog
+    id="notify-dialog"
+    aria-labelledby="notify-title"
+    class="w-[min(92vw,480px)] p-0 rounded-md bg-[#fafaf9] text-stone-900 shadow-2xl backdrop:bg-black/60 backdrop:backdrop-blur-sm">
+    <div class="relative p-8 md:p-10">
+
+        <!-- Fechar -->
+        <button
+            type="button"
+            data-close-notify
+            aria-label="Fechar"
+            class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-md text-stone-400 hover:text-stone-900 hover:bg-stone-100 transition-colors">
+            <iconify-icon icon="solar:close-circle-linear" class="text-2xl"></iconify-icon>
+        </button>
+
+        <!-- ETAPA 1: formulário -->
+        <div data-notify-step="form">
+            <div class="inline-flex items-center gap-2 mb-4">
+                <span class="w-1.5 h-1.5 bg-stone-900 rounded-full"></span>
+                <span class="text-xs font-mono uppercase tracking-[0.2em] text-stone-500">Avise-me</span>
+            </div>
+            <h2 id="notify-title" class="font-display text-3xl font-medium tracking-tight mb-3">
+                Seja o primeiro a saber.
+            </h2>
+            <p class="text-sm text-stone-500 leading-relaxed mb-8">
+                Deixe seus dados e avisamos assim que a <strong data-notify-product class="font-medium text-stone-900">{productName}</strong> chegar.
+            </p>
+
+            <form id="notify-form" class="space-y-5">
+                <input type="hidden" name="produto" value={`${productCode} ${productName}`.trim()} />
+
+                <div>
+                    <label for="notify-name" class={labelClass}>Nome</label>
+                    <input
+                        id="notify-name"
+                        name="nome"
+                        type="text"
+                        autocomplete="name"
+                        required
+                        minlength="2"
+                        placeholder="Seu nome"
+                        class={inputClass} />
+                </div>
+
+                <div>
+                    <label for="notify-email" class={labelClass}>E-mail</label>
+                    <input
+                        id="notify-email"
+                        name="email"
+                        type="email"
+                        autocomplete="email"
+                        required
+                        placeholder="voce@email.com"
+                        class={inputClass} />
+                </div>
+
+                <div>
+                    <label for="notify-phone" class={labelClass}>Telefone</label>
+                    <input
+                        id="notify-phone"
+                        name="telefone"
+                        type="tel"
+                        autocomplete="tel-national"
+                        inputmode="numeric"
+                        required
+                        pattern="\(\d{2}\) \d{4,5}-\d{4}"
+                        title="Telefone com DDD, por exemplo (11) 91234-5678"
+                        placeholder="(11) 91234-5678"
+                        class={inputClass} />
+                </div>
+
+                <div class="pt-3">
+                    <Button type="submit" icon="solar:bell-linear" class="w-full [&>span]:justify-center">
+                        Quero ser avisado
+                    </Button>
+                </div>
+
+                <p class="text-xs text-stone-400 leading-relaxed">
+                    Usaremos seus dados só para avisar sobre a chegada desta caneta.
+                </p>
+            </form>
+        </div>
+
+        <!-- ETAPA 2: mensagem de sucesso (aparece depois de enviar) -->
+        <div data-notify-step="success" hidden class="text-center py-6">
+            <div class="mx-auto mb-6 w-16 h-16 rounded-full bg-stone-900 text-white flex items-center justify-center">
+                <iconify-icon icon="solar:check-circle-linear" class="text-3xl"></iconify-icon>
+            </div>
+            <h2 class="font-display text-3xl font-medium tracking-tight mb-3">
+                Pronto, <span data-notify-name></span>!
+            </h2>
+            <p class="text-sm text-stone-500 leading-relaxed mb-8">
+                Vamos avisar em <span data-notify-email class="text-stone-900"></span>{" "}assim que a <span data-notify-product>{productName}</span> chegar.
+            </p>
+            <Button variant="light" data-close-notify class="w-full justify-center border-stone-300">Fechar</Button>
+        </div>
+    </div>
+</dialog>
+
+<script>
+    // Este script roda no navegador. O Astro junta e otimiza ele automaticamente.
+    const dialog = document.getElementById("notify-dialog") as HTMLDialogElement | null;
+    const form = document.getElementById("notify-form") as HTMLFormElement | null;
+
+    if (dialog && form) {
+        const formStep = dialog.querySelector<HTMLElement>('[data-notify-step="form"]')!;
+        const successStep = dialog.querySelector<HTMLElement>('[data-notify-step="success"]')!;
+        const phone = form.querySelector<HTMLInputElement>('input[name="telefone"]')!;
+
+        const productInput = form.querySelector<HTMLInputElement>('input[name="produto"]')!;
+        const productTexts = dialog.querySelectorAll<HTMLElement>("[data-notify-product]");
+
+        // Abrir: qualquer botão com data-open-notify
+        document.querySelectorAll<HTMLElement>("[data-open-notify]").forEach((button) => {
+            button.addEventListener("click", () => {
+                form.reset();
+
+                // Se o botão disser de qual caneta é, a janela passa a falar dela
+                const { productName, productCode } = button.dataset;
+                if (productName) {
+                    productTexts.forEach((element) => (element.textContent = productName));
+                    productInput.value = `${productCode ?? ""} ${productName}`.trim();
+                }
+
+                formStep.hidden = false;
+                successStep.hidden = true;
+                dialog.showModal();
+            });
+        });
+
+        // Fechar: botões com data-close-notify ou clique fora da janela
+        dialog.querySelectorAll("[data-close-notify]").forEach((button) => {
+            button.addEventListener("click", () => dialog.close());
+        });
+        dialog.addEventListener("click", (event) => {
+            if (event.target === dialog) dialog.close();
+        });
+
+        // Máscara do telefone: vai formatando enquanto a pessoa digita → (11) 91234-5678
+        phone.addEventListener("input", () => {
+            const digits = phone.value.replace(/\D/g, "").slice(0, 11);
+            let formatted = digits;
+            if (digits.length > 2) formatted = `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+            if (digits.length > 6) {
+                const split = digits.length === 11 ? 7 : 6;
+                formatted = `(${digits.slice(0, 2)}) ${digits.slice(2, split)}-${digits.slice(split)}`;
+            }
+            phone.value = formatted;
+        });
+
+        // Enviar
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const data = Object.fromEntries(new FormData(form));
+
+            // ENVIO: por enquanto os dados só aparecem no console do navegador.
+            // Aqui entraria o envio de verdade, por exemplo:
+            //   await fetch("https://seu-servico-de-formularios", { method: "POST", body: new FormData(form) });
+            console.log("Avise-me:", data);
+
+            dialog.querySelector("[data-notify-name]")!.textContent = String(data.nome).split(" ")[0];
+            dialog.querySelector("[data-notify-email]")!.textContent = String(data.email);
+            formStep.hidden = true;
+            successStep.hidden = false;
+        });
+    }
+</script>

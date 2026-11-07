@@ -1,0 +1,95 @@
+---
+// Card de produto para o catálogo: foto, código do modelo, título, descrição,
+// duas especificações rápidas e o botão "Avise-me" (usa o componente Button).
+// Uso:
+//   <ProductCard
+//       code="AT-01"
+//       title="Precision One"
+//       description="A caneta original da linha."
+//       image="https://images.unsplash.com/photo-..."
+//       imageAlt="Caneta prateada sobre papel branco"
+//       specs={[{ label: "Ponta", value: "0,3 mm" }, { label: "Peso", value: "14 g" }]}
+//   />
+//
+// code:        código do modelo, mostrado sobre a foto
+// title:       nome da caneta
+// description: texto curto sobre a caneta
+// image:       endereço da foto (pode ser um arquivo em /public ou um link externo)
+// imageAlt:    descrição da foto para leitores de tela
+// specs:       lista de especificações rápidas (nome e valor)
+// href:        link da página de detalhes (opcional). Se informado, a foto e o título viram links.
+import Button from "./Button.astro";
+
+interface Spec {
+	label: string;
+	value: string;
+}
+
+interface Props {
+	code: string;
+	title: string;
+	description: string;
+	image: string;
+	imageAlt: string;
+	specs?: Spec[];
+	href?: string;
+}
+
+const { code, title, description, image, imageAlt, specs = [], href } = Astro.props;
+
+// Com link vira <a>, sem link continua <div> / texto simples
+const PhotoWrapper = href ? "a" : "div";
+---
+
+<article
+    class="group h-full flex flex-col bg-white border border-stone-300 rounded-sm overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-stone-300/50">
+
+    <!-- Foto: em preto e branco, ganha cor quando passa o mouse (igual à foto da página inicial) -->
+    <PhotoWrapper href={href} tabindex={href ? "-1" : undefined} aria-hidden={href ? "true" : undefined} class="block relative aspect-[4/3] overflow-hidden bg-stone-100">
+        <img
+            src={image}
+            alt={imageAlt}
+            loading="lazy"
+            class="w-full h-full object-cover grayscale group-hover:grayscale-0 scale-105 group-hover:scale-100 transition-all duration-700" />
+        <span
+            class="absolute top-4 right-4 px-2 py-1 rounded-sm bg-white/80 backdrop-blur-md text-[10px] font-mono uppercase tracking-[0.2em] text-stone-700">
+            {code}
+        </span>
+    </PhotoWrapper>
+
+    <div class="flex-1 flex flex-col p-8">
+        <!-- Título e descrição -->
+        <h2 class="text-2xl font-display font-medium tracking-tight text-stone-900 mb-3">
+            {href ? <a href={href} class="hover:text-stone-500 transition-colors">{title}</a> : title}
+        </h2>
+        <p class="text-sm text-stone-500 leading-relaxed mb-8">{description}</p>
+
+        <!-- Especificações rápidas -->
+        {specs.length > 0 && (
+            <dl class="mb-8 border-t border-stone-200">
+                {specs.map((spec) => (
+                    <div class="flex justify-between gap-4 py-3 border-b border-stone-200 text-sm">
+                        <dt class="font-mono text-xs uppercase tracking-widest text-stone-400">{spec.label}</dt>
+                        <dd class="text-stone-900 text-right">{spec.value}</dd>
+                    </div>
+                ))}
+            </dl>
+        )}
+
+        <!--
+            Botão sempre no pé do card, mesmo com textos de tamanhos diferentes.
+            data-open-notify + data-product-*: abre o formulário (NotifyForm) já com esta caneta.
+            A página precisa ter um <NotifyForm /> para o botão funcionar.
+        -->
+        <div class="mt-auto">
+            <Button
+                icon="solar:bell-linear"
+                data-open-notify
+                data-product-name={title}
+                data-product-code={code}
+                aria-haspopup="dialog">
+                Avise-me
+            </Button>
+        </div>
+    </div>
+</article>

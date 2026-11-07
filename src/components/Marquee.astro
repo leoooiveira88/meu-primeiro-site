@@ -1,0 +1,73 @@
+---
+// Faixa de palavras que corre sem parar da direita para a esquerda (marquee infinito).
+// Uso:
+//   <Marquee words={["Precisão", "Fluxo", "Leveza"]} />
+//
+// words:    lista de palavras que aparecem na faixa
+// duration: quantos segundos leva para a faixa dar uma volta completa (padrão 40)
+//
+// Como o "infinito" funciona: a lista é desenhada duas vezes, uma ao lado da
+// outra, e a faixa anda exatamente a largura de uma lista (-50%). Quando a
+// animação recomeça, a segunda lista está no lugar onde a primeira estava,
+// então o corte não aparece.
+
+interface Props {
+	words: string[];
+	duration?: number;
+}
+
+const { words, duration = 40 } = Astro.props;
+---
+
+<!--
+    text-6xl/[1.3]: fontes cursivas têm hastes longas (g, f, ç, l) que passam
+    da altura normal da linha. Com a linha um pouco mais alta (1.3x o tamanho da letra),
+    o overflow-hidden (que esconde as palavras fora da tela) não corta as pontas.
+    1.3 é o mínimo seguro para a Pinyon Script; abaixo disso as pontas voltam a cortar.
+    A altura da linha vai junto no tamanho ("/[1.3]") porque md:text-5xl e
+    lg:text-6xl já trazem a própria altura de linha e anulariam um leading-* separado.
+-->
+<div class="marquee overflow-hidden" style={`--duration: ${duration}s`}>
+    <div class="marquee-track flex w-max">
+        {[0, 1].map((copy) => (
+            <ul class="flex shrink-0 items-center" aria-hidden={copy === 1 ? "true" : undefined}>
+                {words.map((word) => (
+                    <li class="flex items-center">
+                        <span class="font-script text-white text-4xl/[1.3] md:text-5xl/[1.3] lg:text-6xl/[1.3] px-4 md:px-6 whitespace-nowrap">
+                            {word}
+                        </span>
+                        <span class="text-stone-600 text-base md:text-xl" aria-hidden="true">✦</span>
+                    </li>
+                ))}
+            </ul>
+        ))}
+    </div>
+</div>
+
+<style>
+    .marquee-track {
+        animation: marquee var(--duration) linear infinite;
+    }
+
+    /* Para quando a pessoa passa o mouse, para dar tempo de ler */
+    .marquee:hover .marquee-track {
+        animation-play-state: paused;
+    }
+
+    @keyframes marquee {
+        from {
+            transform: translateX(0);
+        }
+
+        to {
+            transform: translateX(-50%);
+        }
+    }
+
+    /* Respeita quem pediu menos movimento no sistema operacional */
+    @media (prefers-reduced-motion: reduce) {
+        .marquee-track {
+            animation: none;
+        }
+    }
+</style>

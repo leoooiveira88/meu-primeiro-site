@@ -1,0 +1,56 @@
+---
+// Segunda página do site: catálogo de produtos.
+// Endereço: /segunda-pagina — no Astro, o nome do arquivo dentro de src/pages vira a URL.
+// O Layout já traz o <head>, as fontes, os estilos, o cabeçalho e o rodapé.
+// Cada caneta é um ProductCard, que por sua vez usa o componente Button ("Avise-me").
+// O botão "Avise-me" de cada card abre o formulário (NotifyForm) já com aquela caneta.
+// Clicar na foto ou no título de um card abre a página de detalhes daquela caneta.
+import Layout from "../layouts/Layout.astro";
+import ProductCard from "../components/ProductCard.astro";
+import NotifyForm from "../components/NotifyForm.astro";
+
+// Os dados das canetas ficam em src/data/products.ts, porque a página de detalhes
+// (src/pages/produto/[slug].astro) também usa a mesma lista.
+import { products, photoUrl } from "../data/products";
+---
+
+<Layout title="Catálogo | Artools">
+    <main class="min-h-screen pt-32 md:pt-40 pb-24 md:pb-32">
+        <div class="max-w-[1440px] mx-auto px-6 md:px-24">
+
+            <!-- Cabeçalho do catálogo -->
+            <header class="mb-16 md:mb-24">
+                <div class="inline-flex items-center gap-2 mb-6">
+                    <span class="w-1.5 h-1.5 bg-stone-400 rounded-full"></span>
+                    <span class="text-xs font-mono uppercase tracking-[0.2em] text-stone-500">Catálogo</span>
+                </div>
+                <h1 class="font-display text-5xl md:text-7xl font-medium tracking-tight leading-none text-stone-900">
+                    Nossas canetas.<br>
+                    <span class="text-stone-400">Em breve.</span>
+                </h1>
+                <p class="mt-8 text-lg text-stone-500 max-w-2xl font-light leading-relaxed">
+                    Nove modelos, uma mesma obsessão por precisão. Clique em "Avise-me" para saber
+                    primeiro quando cada caneta chegar.
+                </p>
+            </header>
+
+            <!-- Grade de produtos: 1 coluna no celular, 2 no tablet, 3 no desktop -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {products.map((product) => (
+                    <ProductCard
+                        code={product.code}
+                        title={product.title}
+                        description={product.description}
+                        specs={product.specs}
+                        image={photoUrl(product.photoId)}
+                        imageAlt={product.imageAlt}
+                        href={`/produto/${product.slug}`}
+                    />
+                ))}
+            </div>
+        </div>
+    </main>
+
+    <!-- Formulário "Avise-me": um só para a página, abre com a caneta do botão clicado -->
+    <NotifyForm />
+</Layout>

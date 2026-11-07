@@ -1,0 +1,113 @@
+---
+// Cabeçalho do site (logo, menu e ícones).
+// É usado dentro do Layout, então aparece em todas as páginas.
+//
+// Os links do menu ficam na lista "links" abaixo: para adicionar uma página ao menu,
+// é só incluir mais um item. A mesma lista monta o menu do desktop e o do celular.
+// O link da página em que a pessoa está fica destacado (aria-current="page").
+
+const links = [
+	{ label: "Início", href: "/" },
+	{ label: "Tecnologia", href: "/#tech-specs" },
+	{ label: "Especificações", href: "/#especificacoes" },
+	{ label: "Catálogo", href: "/segunda-pagina" },
+];
+
+// Endereço da página atual, sem a barra do final (ex.: "/segunda-pagina")
+const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
+
+// Um link está "ativo" quando aponta para a página atual.
+// Links com # (âncoras da página inicial) nunca ficam ativos, para não destacar três itens ao mesmo tempo.
+// O catálogo também fica ativo nas páginas de produto, que são "filhas" dele.
+const isActive = (href: string) => {
+	if (href.includes("#")) return false;
+	if (href === "/") return currentPath === "/";
+	return currentPath === href || (href === "/segunda-pagina" && currentPath.startsWith("/produto/"));
+};
+---
+
+<!-- NAVBAR -->
+<header class="fixed w-full z-50 top-0 transition-all duration-300" id="navbar">
+    <div class="absolute inset-0 bg-white/70 backdrop-blur-md border-b border-stone-200/50"></div>
+    <div class="max-w-[1440px] mx-auto px-6 py-4 relative flex justify-between items-center">
+        <!-- Logo (leva para a página inicial) -->
+        <a href="/" class="flex items-center gap-2 group" aria-label="Artools — página inicial">
+            <div
+                class="w-8 h-8 bg-stone-900 text-white flex items-center justify-center rounded-sm transition-transform group-hover:rotate-90 duration-500">
+                <iconify-icon icon="solar:pen-new-square-bold-duotone" class="text-xl"></iconify-icon>
+            </div>
+            <span class="font-display font-medium tracking-tight text-lg">ARTOOLS<span
+                    class="text-stone-400">.PRO</span></span>
+        </a>
+
+        <!-- Menu (desktop) -->
+        <nav aria-label="Menu principal" class="hidden md:flex items-center gap-8 text-xs font-mono uppercase tracking-widest text-stone-500">
+            {links.map((link) => (
+                <a
+                    href={link.href}
+                    aria-current={isActive(link.href) ? "page" : undefined}
+                    class="hover:text-stone-900 transition-colors aria-[current=page]:text-stone-900">
+                    {link.label}
+                </a>
+            ))}
+        </nav>
+
+        <!-- Ações -->
+        <div class="flex items-center gap-4">
+            <iconify-icon icon="solar:bag-linear"
+                class="text-xl cursor-pointer hover:text-stone-500 transition-colors"></iconify-icon>
+            <div class="hidden md:block w-px h-4 bg-stone-300"></div>
+
+            <!-- Botão do menu (só no celular) -->
+            <button
+                type="button"
+                id="menu-toggle"
+                aria-label="Abrir menu"
+                aria-expanded="false"
+                aria-controls="mobile-menu"
+                class="md:hidden w-9 h-9 -mr-2 flex items-center justify-center rounded-md hover:bg-stone-100 transition-colors">
+                <iconify-icon icon="solar:hamburger-menu-linear" class="text-xl" data-menu-icon></iconify-icon>
+            </button>
+        </div>
+    </div>
+
+    <!-- Menu (celular): abre e fecha pelo botão acima -->
+    <nav
+        id="mobile-menu"
+        aria-label="Menu principal"
+        hidden
+        class="md:hidden relative border-b border-stone-200/50 bg-white/90 backdrop-blur-md">
+        <ul class="px-6 py-2">
+            {links.map((link) => (
+                <li class="border-b border-stone-200 last:border-b-0">
+                    <a
+                        href={link.href}
+                        aria-current={isActive(link.href) ? "page" : undefined}
+                        class="block py-4 text-sm font-mono uppercase tracking-widest text-stone-500 hover:text-stone-900 aria-[current=page]:text-stone-900">
+                        {link.label}
+                    </a>
+                </li>
+            ))}
+        </ul>
+    </nav>
+</header>
+
+<script>
+    // Abre e fecha o menu do celular
+    const toggle = document.getElementById("menu-toggle");
+    const menu = document.getElementById("mobile-menu");
+    const icon = toggle?.querySelector("[data-menu-icon]");
+
+    const setOpen = (open: boolean) => {
+        if (!toggle || !menu) return;
+        menu.hidden = !open;
+        toggle.setAttribute("aria-expanded", String(open));
+        toggle.setAttribute("aria-label", open ? "Fechar menu" : "Abrir menu");
+        icon?.setAttribute("icon", open ? "solar:close-circle-linear" : "solar:hamburger-menu-linear");
+    };
+
+    toggle?.addEventListener("click", () => setOpen(menu?.hidden ?? false));
+
+    // Fecha o menu ao escolher um link (importante para os links com # da própria página)
+    menu?.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => setOpen(false)));
+</script>

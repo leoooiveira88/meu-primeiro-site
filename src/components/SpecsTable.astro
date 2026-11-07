@@ -1,0 +1,44 @@
+---
+// Tabela de especificações técnicas em lista simples:
+// nome em maiúsculas e negrito à esquerda, valor ao lado, linha fina entre os itens.
+// Feita para fundo escuro.
+// Uso:
+//   <SpecsTable rows={[
+//       { label: "Peso", value: "14 g" },
+//       { label: "Ponta", value: "0,3 mm" },
+//   ]} />
+//
+// rows:    lista de itens, cada um com o nome (label) e o valor (value)
+// caption: descrição da tabela para leitores de tela (não aparece na tela)
+
+interface Row {
+	label: string;
+	value: string;
+}
+
+interface Props {
+	rows: Row[];
+	caption?: string;
+}
+
+const { rows, caption = "Especificações técnicas" } = Astro.props;
+---
+
+<table class="w-full border-collapse text-left">
+    <caption class="sr-only">{caption}</caption>
+    <tbody>
+        {/* No celular, nome em cima e valor embaixo; a partir do tablet, lado a lado */}
+        {rows.map((row) => (
+            <tr class="flex flex-col gap-2 md:table-row border-b border-stone-800 last:border-b-0">
+                <th
+                    scope="row"
+                    class="pt-7 md:py-7 md:w-[230px] md:pr-8 align-middle text-sm font-sans font-semibold uppercase tracking-wide text-white">
+                    {row.label}
+                </th>
+                <td class="pb-7 md:py-7 align-middle text-sm md:text-base font-sans font-light text-stone-400">
+                    {row.value}
+                </td>
+            </tr>
+        ))}
+    </tbody>
+</table>
